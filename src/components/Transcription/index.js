@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { AccuracyContainer, AccuracyLabel, AccuracyText, AccuracyTextContainer, ActionSection, Audio, AudioContainer, Container, Loader, LoaderContainer, LoaderText, ResultSection, Source, TranscribeButton, TranscribeButtonContainer, TranscriptionContainer, TranscriptionLabel, TranscriptionText, UploadBox, UploadInput, UploadText, UploadTextContainer } from './styles';
+import { AccuracyContainer, AccuracyLabel, AccuracyText, AccuracyTextContainer, ActionSection, Audio, AudioContainer, Container, Loader, LoaderContainer, LoaderText, ResultList, ResultSection, Source, TranscribeButton, TranscribeButtonContainer, TranscriptionContainer, TranscriptionLabel, TranscriptionText, UploadBox, UploadInput, UploadText, UploadTextContainer } from './styles';
 import axios from 'axios';
 import { BeatLoader } from 'react-spinners';
 import { useDropzone } from 'react-dropzone';
@@ -7,6 +7,7 @@ import { useDropzone } from 'react-dropzone';
 const Transcription = () => { 
     const [file, setFile] = useState(null);
     const [transcription, setTranscription] = useState("");
+    const [confidence, setConfidence] = useState(0.0);
     const [accuracy, setAccuracy] = useState(0.0);
     const [loading, setLoading] = useState(false);
     const [audioUrl, setAudioUrl] = useState(null);
@@ -62,7 +63,7 @@ const Transcription = () => {
 
         try {
             const response = await axios.post(
-                "https://localhost:7024/api/speech-to-text",
+                "http://localhost:5000/api/speech-to-text",
                 formData,
                 {
                     headers: {
@@ -77,8 +78,7 @@ const Transcription = () => {
             const { text, confidence } = response.data;
 
             setTranscription(text);
-            const accuracy = (parseFloat(confidence) * 100);
-            setAccuracy(accuracy);
+            setConfidence(confidence);
             setLoading(false);
         } catch (error) {
             console.log(error);
@@ -96,6 +96,20 @@ const Transcription = () => {
         else if (accuracy >= 60.00)
             return '#bfb300';
         else if (accuracy >= 40.00)
+            return '#bf5c00';
+        else
+            return '#ab0207';
+    }
+
+    const getConfidenceColor = () => { 
+        if (confidence === null)
+            return '#ab0207';
+
+        if (confidence >= 80.00)
+            return '#01801d';
+        else if (confidence >= 60.00)
+            return '#bfb300';
+        else if (confidence >= 40.00)
             return '#bf5c00';
         else
             return '#ab0207';
@@ -152,13 +166,22 @@ const Transcription = () => {
                 <TranscriptionContainer>
                     <TranscriptionText>{transcription}</TranscriptionText>
                 </TranscriptionContainer>
-                <div style={{ height: 20 }}></div>
-                <AccuracyContainer color={getAccuracyColor()}>
-                    <AccuracyTextContainer>
-                        <AccuracyLabel>Accuracy</AccuracyLabel>
-                        <AccuracyText>{accuracy.toFixed(2)}</AccuracyText>
-                    </AccuracyTextContainer>
-                </AccuracyContainer>
+                    <div style={{ height: 20 }}></div>
+                <ResultList>
+                    <AccuracyContainer color={getConfidenceColor()}>
+                        <AccuracyTextContainer>
+                            <AccuracyLabel>Confidence</AccuracyLabel>
+                            <AccuracyText>{confidence.toFixed(2)}</AccuracyText>
+                        </AccuracyTextContainer>
+                    </AccuracyContainer>
+                    <div style={{ width: 40 }}></div>
+                    <AccuracyContainer color={getAccuracyColor()}>
+                        <AccuracyTextContainer>
+                            <AccuracyLabel>Accuracy</AccuracyLabel>
+                            <AccuracyText>{accuracy.toFixed(2)}</AccuracyText>
+                        </AccuracyTextContainer>
+                    </AccuracyContainer>  
+                </ResultList>
                 <div style={{ height: 20 }}></div>
             </ResultSection> : null}
         </Container>

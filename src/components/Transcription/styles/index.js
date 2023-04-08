@@ -73,6 +73,15 @@ export const ResultSection = styled.div`
     }
 `;
 
+export const ResultList = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: auto;
+    justify-content: center;
+    width: fit-content;
+`;
+
 export const AccuracyContainer = styled.div`
     width: 150px;
     height: 150px;
@@ -81,6 +90,7 @@ export const AccuracyContainer = styled.div`
     margin: auto;
     position: relative;
     color: ${({ color = 'red' }) => color};
+    background-color: #0f0f0f;
 `;
 
 export const AccuracyTextContainer = styled.div`
@@ -91,7 +101,7 @@ export const AccuracyTextContainer = styled.div`
 `;
 
 export const AccuracyLabel = styled.label`
-    font-size: 23px;
+    font-size: 19px;
     margin: 0;
     text-align: center;
 `;
